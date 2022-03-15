@@ -41,6 +41,10 @@ delete_tasks_label = Inconsolata50.render("Delete", 1, white)
 exit_label = Inconsolata50.render("Exit", 1, red)
 chooser_sign = Inconsolata50.render(">", 1, white)
 your_tasks_title = Inconsolata90.render("Your Tasks", 1, white)
+press_esc = Inconsolata50.render("Press 'ESC' to Escape", 1, red)
+create_task_name = Inconsolata90.render("Task Name?", 1, white)
+user_text = ''
+text_surface = Inconsolata50.render(user_text, 1, white)
 
 # tasks
 tasks = ["1. Eat Breakfast", "2. Sleep", "3. Code"]
@@ -49,11 +53,11 @@ tasks = ["1. Eat Breakfast", "2. Sleep", "3. Code"]
 task_length = len(tasks)
 
 # variables
-x = 0
-y = 0
 running = True
 point = 0
 menu = True
+view_tasks = False
+create_tasks = False
 
 # main loop
 while running == True:
@@ -113,14 +117,45 @@ while running == True:
             if event.type == QUIT:
                 pygame.quit()
                 sys.exit()
+            elif event.type == KEYUP:
+                if event.key == K_ESCAPE:
+                    view_tasks = False
+                    menu = True
 
         # graphics
         window.fill(black)
         window.blit(your_tasks_title, (65, 70))
+        window.blit(press_esc, (35, 700))
+        x = 150
+        y = 230
 
         for task in tasks:
             task = Inconsolata50.render(task, 1, white)
             window.blit(task, (x, y))
+            y += 75
+
+    elif create_task == True:
+
+        # event checker
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYUP:
+                if event.key == K_ESCAPE:
+                    create_task = False
+                    menu = True
+            elif event.type == KEYDOWN:
+                if event.key == K_BACKSPACE:
+                    user_text = user_text[:-1]
+                else:
+                    user_text += event.unicode
+
+        # graphics
+        window.fill(black)
+        window.blit(create_task_name, (80, 180))
+        window.blit(press_esc, (35, 700))
+        window.blit(text_surface, (0, 0))
 
     # update graphics
     pygame.display.update()
