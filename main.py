@@ -35,16 +35,22 @@ Inconsolata50 = pygame.font.Font("inconsolata.regular.ttf", 50)
 
 # text
 to_do_title = Inconsolata90.render("To-Do List", 1, white)
-view_tasks = Inconsolata50.render("View", 1, white)
-create_tasks = Inconsolata50.render("Create", 1, white)
-delete_tasks = Inconsolata50.render("Delete", 1, white)
+view_tasks_label = Inconsolata50.render("View", 1, white)
+create_tasks_label = Inconsolata50.render("Create", 1, white)
+delete_tasks_label = Inconsolata50.render("Delete", 1, white)
 exit_label = Inconsolata50.render("Exit", 1, red)
 chooser_sign = Inconsolata50.render(">", 1, white)
+your_tasks_title = Inconsolata90.render("Your Tasks", 1, white)
 
 # tasks
-to_do_list = ["Eat Breakfast", "Sleep", "Code"]
+tasks = ["1. Eat Breakfast", "2. Sleep", "3. Code"]
+
+# calculations
+task_length = len(tasks)
 
 # variables
+x = 0
+y = 0
 running = True
 point = 0
 menu = True
@@ -64,13 +70,26 @@ while running == True:
                     point -= 1
                 elif event.key == K_DOWN:
                     point += 1
+                elif event.key == K_RETURN:
+                    if point == 0:
+                        view_tasks = True
+                        menu = False
+                    elif point == 1:
+                        create_task = True
+                        menu = False
+                    elif point == 2:
+                        delete_task = True
+                        menu = False
+                    elif point == 3:
+                        pygame.quit()
+                        sys.exit()
 
         # graphics
         window.fill(black)
         window.blit(to_do_title, (65, 70))
-        window.blit(view_tasks, (220, 280))
-        window.blit(create_tasks, (220, 370))
-        window.blit(delete_tasks, (220, 460))
+        window.blit(view_tasks_label, (220, 280))
+        window.blit(create_tasks_label, (220, 370))
+        window.blit(delete_tasks_label, (220, 460))
         window.blit(exit_label, (220, 550))
 
         if point == 0:
@@ -86,6 +105,22 @@ while running == True:
             window.blit(chooser_sign, (174, 550))
 
         point = point % 4
+
+    elif view_tasks == True:
+
+        # event checker
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+
+        # graphics
+        window.fill(black)
+        window.blit(your_tasks_title, (65, 70))
+
+        for task in tasks:
+            task = Inconsolata50.render(task, 1, white)
+            window.blit(task, (x, y))
 
     # update graphics
     pygame.display.update()
