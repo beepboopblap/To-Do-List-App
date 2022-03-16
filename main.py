@@ -1,8 +1,9 @@
-import pickle
 import os
 import pygame
 from pygame import *
+from pygame_functions import *
 import sys
+import pickle
 os.system("clear")
 
 SCREEN_WIDTH = 600
@@ -42,13 +43,12 @@ exit_label = Inconsolata50.render("Exit", 1, red)
 chooser_sign = Inconsolata50.render(">", 1, white)
 your_tasks_title = Inconsolata90.render("Your Tasks", 1, white)
 press_esc = Inconsolata50.render("Press 'ESC' to Escape", 1, red)
-create_task_name = Inconsolata90.render("Task Name?", 1, white)
-user_text = ''
-text_surface = Inconsolata50.render(user_text, 1, white)
+create_task_name = Inconsolata90.render("Create Tasks", 1, white)
+create_instruct = Inconsolata50.render("Type in Terminal", 1, white)
 delete_task_name = Inconsolata50.render("Which Task to Delete?", 1, white)
 
 # tasks
-tasks = ["1. Eat Breakfast", "2. Sleep", "3. Code"]
+tasks = []
 
 # calculations
 task_length = len(tasks)
@@ -61,15 +61,22 @@ menu = True
 view_tasks = False
 create_task = False
 delete_task = False
+user_input = False
+
+# load tasks from save
+tasks = pickle.load(open("tasks.txt", "rb"))
 
 # main loop
 while running == True:
+
+    pickle.dump(tasks, open("tasks.txt", "wb"))
 
     if menu == True:
 
         # event checker
         for event in pygame.event.get():
             if event.type == QUIT:
+                pickle.dump(tasks, open("tasks.txt", "wb"))
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP:
@@ -88,6 +95,7 @@ while running == True:
                         delete_task = True
                         menu = False
                     elif point == 3:
+                        pickle.dump(tasks, open("tasks.txt", "wb"))
                         pygame.quit()
                         sys.exit()
 
@@ -111,6 +119,10 @@ while running == True:
         elif point == 3:
             window.blit(chooser_sign, (174, 550))
 
+        elif user_input == True:
+            create_input = int(input("Enter: "))
+            print("Task Created!")
+
         point = point % 4
 
     elif view_tasks == True:
@@ -118,6 +130,7 @@ while running == True:
         # event checker
         for event in pygame.event.get():
             if event.type == QUIT:
+                pickle.dump(tasks, open("tasks.txt", "wb"))
                 pygame.quit()
                 sys.exit()
             elif event.type == KEYUP:
@@ -139,73 +152,71 @@ while running == True:
 
     elif create_task == True:
 
-        # event checker
+        # graphics
+        window.fill(black)
+        window.blit(create_task_name, (35, 119))
+        window.blit(create_instruct, (80, 300))
+
+        pygame.display.update()
+        fps.tick(25)
+        user_input = input("Create Task (input '' to quit): ")
+        if user_input in tasks:
+            print("Task already exists!")
+            continue
+        elif user_input == "":
+            quit = True
+            running = False
+        else:
+            tasks.append(user_input)
+
+        pickle.dump(tasks, open("tasks.txt", "wb"))
+
         for event in pygame.event.get():
             if event.type == QUIT:
+                pickle.dump(tasks, open("tasks.txt", "wb"))
                 pygame.quit()
                 sys.exit()
-            elif event.type == KEYUP:
+            elif event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     create_task = False
                     menu = True
-            elif event.type == KEYDOWN:
-                if event.key == K_BACKSPACE:
-                    user_text = user_text[:-1]
-                else:
-                    user_text += event.unicode
 
-        # graphics
-        window.fill(black)
-        window.blit(create_task_name, (80, 180))
-        window.blit(press_esc, (35, 700))
-        window.blit(text_surface, (0, 0))
+        print("Created!")
+        create_task = False
+        menu = True
 
     elif delete_task == True:
-
-        # event checker
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == KEYUP:
-                if event.key == K_ESCAPE:
-                    delete_task = False
-                    menu = True
-                elif event.key == K_UP:
-                    delete_point -= 1
-                elif event.key == K_DOWN:
-                    delete_point += 1
-                elif event.key == K_RETURN:
-                    if point == 0:
-                        tasks.remove(task[0])
-                    elif point == 1:
-                        tasks.remove(task[1])
-                    elif point == 2:
-                        tasks.remove(task[2])
-                    elif point == 3:
-                        tasks.remove(task[3])
 
         # graphics
         window.fill(black)
         window.blit(delete_task_name, (30, 70))
         window.blit(press_esc, (35, 700))
+        pygame.display.update()
+        fps.tick(25)
 
-        if point == 0:
-            window.blit(chooser_sign, (174, 280))
-        elif point == 1:
-            window.blit(chooser_sign, (174, 370))
-        elif point == 2:
-            window.blit(chooser_sign, (174, 460))
-        elif point == 3:
-            window.blit(chooser_sign, (174, 550))
+        user_input = input("Name Of Task to Delete (input '' to quit): ")
+        if user_input in tasks:
+            tasks.remove(user_input)
+            pickle.dump(tasks, open("tasks.txt", "wb"))
+        elif user_input == "":
+            quit = True
+            running = False
+        else:
+            print("Task does not exist!")
+            continue
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pickle.dump(tasks, open("tasks.txt", "wb"))
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    create_task = False
+                    menu = True
 
-        x = 150
-        y = 230
-
-        for task in tasks:
-            task = Inconsolata50.render(task, 1, white)
-            window.blit(task, (x, y))
-            y += 75
+        print("Deleted!")
+        delete_task = False
+        menu = True
 
     # update graphics
     pygame.display.update()
