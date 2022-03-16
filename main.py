@@ -45,6 +45,7 @@ press_esc = Inconsolata50.render("Press 'ESC' to Escape", 1, red)
 create_task_name = Inconsolata90.render("Task Name?", 1, white)
 user_text = ''
 text_surface = Inconsolata50.render(user_text, 1, white)
+delete_task_name = Inconsolata50.render("Which Task to Delete?", 1, white)
 
 # tasks
 tasks = ["1. Eat Breakfast", "2. Sleep", "3. Code"]
@@ -55,9 +56,11 @@ task_length = len(tasks)
 # variables
 running = True
 point = 0
+delete_point = 0
 menu = True
 view_tasks = False
-create_tasks = False
+create_task = False
+delete_task = False
 
 # main loop
 while running == True:
@@ -156,6 +159,53 @@ while running == True:
         window.blit(create_task_name, (80, 180))
         window.blit(press_esc, (35, 700))
         window.blit(text_surface, (0, 0))
+
+    elif delete_task == True:
+
+        # event checker
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == KEYUP:
+                if event.key == K_ESCAPE:
+                    delete_task = False
+                    menu = True
+                elif event.key == K_UP:
+                    delete_point -= 1
+                elif event.key == K_DOWN:
+                    delete_point += 1
+                elif event.key == K_RETURN:
+                    if point == 0:
+                        tasks.remove(task[0])
+                    elif point == 1:
+                        tasks.remove(task[1])
+                    elif point == 2:
+                        tasks.remove(task[2])
+                    elif point == 3:
+                        tasks.remove(task[3])
+
+        # graphics
+        window.fill(black)
+        window.blit(delete_task_name, (30, 70))
+        window.blit(press_esc, (35, 700))
+
+        if point == 0:
+            window.blit(chooser_sign, (174, 280))
+        elif point == 1:
+            window.blit(chooser_sign, (174, 370))
+        elif point == 2:
+            window.blit(chooser_sign, (174, 460))
+        elif point == 3:
+            window.blit(chooser_sign, (174, 550))
+
+        x = 150
+        y = 230
+
+        for task in tasks:
+            task = Inconsolata50.render(task, 1, white)
+            window.blit(task, (x, y))
+            y += 75
 
     # update graphics
     pygame.display.update()
